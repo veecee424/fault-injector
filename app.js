@@ -4,103 +4,81 @@ const app = express()
 const falseInjections = [9007199254740992n, NaN, "string injection", 12345, Infinity, -Infinity, -123456, "1239084", 2.3985, "-123456784", true, false, undefined, null, [1,2,3], [], {}, 0, '']
 
 const testfunction = (a, b, c) => {
-    if (typeof a != 'number') {
-        return 'Not a number'
+    if (typeof a != 'string') {
+        return {
+            status: 'Error',
+            message: 'first param must be a string',
+        }
     }
-    return `${a}, ${b}, ${c}`
+    return {
+        message: 'Successful injection'
+    }
 }
 
-const inputPayloadDescription = (...params) => {
-    // console.log(params)
-    return params
-}
-
-// inputPayloadDescription('email', 'password')
-
-const checkType = (fxn, numOfParams) => {
+const checkType = (fxn) => {
     if (typeof fxn == 'function') {
-        return fxn
-    } else {
-        return false
-    }
+        return true
+    } 
 }
 
-const checkParams = (fxn, numOfParams) => {
+const checkParams = (fxn, ...params) => {
     let type = checkType(fxn)
-    if (!type) {
-        return 'Not a function'
+
+    for (let i = 0; i < params.length; i++) {
+        if (typeof params[i] != 'string') {
+            throw new Error ('Specify all parameters as strings')
+        }
     }
 
-    if (numOfParams && typeof numOfParams == 'number') {
-        return numOfParams
+    if (!type) {
+        throw new Error ('Not a function - The first argument must be a function')
+    }
+ 
+    if (params.length) {
+        return params.length
     } else {
-        return 'No parameter(s) passed'
+        throw new Error ('No parameter(s) specified - how I wan take run false injections?')
     }
 }
 
-const generateRandomInjections = (numOfParams) => {
+const generateRandomInjections = (...params) => {
     let arr = []
-    for (let i = 0; i<numOfParams; i ++) {
+    for (let i = 0; i<params.length; i ++) {
         arr.push(falseInjections[Math.floor(Math.random() * falseInjections.length)])
     }
     return arr;
 }
 
-const throwInjections = (fxn, numOfParams) => {
+const throwInjections = (fxn, ...params) => {
     let payloadObj = {}
+    let responseObj = {}
     let injections;
     try {
-        const passedArgs = checkParams(fxn, numOfParams)
+        const passedArgs = checkParams(fxn, ...params)
         if (typeof passedArgs != 'number') {
             throw new Error(passedArgs)
         }
-        injections = generateRandomInjections(passedArgs)
-        // for (let i = 0; i < falseInjections.length; i++) {
-        //     injections = generateRandomInjections(passedArgs)
-        //     response.push(fxn(...injections))
-        //     payload.push(injections)
-        // }
-        // console.log(injections)
-        //Format payload
-        let payloadDescription = inputPayloadDescription('id', 'email')
-        for (let i = 0; i < payloadDescription.length; i++) {
-            payloadObj[payloadDescription[i]] = injections[i]
+        injections = generateRandomInjections(...params)
+       
+        //Format payload & response
+        for (let i = 0; i < params.length; i++) {
+            payloadObj[params[i]] = injections[i]
         }
-        console.log(payloadObj) 
-        return injections
+        responseObj = fxn(...injections)
+        return {
+            payload: payloadObj,
+            response: responseObj
+        }
     } catch (e) {
-        console.log(e)
+        return {
+            status: 'Error',
+            message: e.message,
+        }
     }
 }
 
-throwInjections(testfunction, 2)
+console.log(throwInjections(testfunction, "email", "phone"))
 
-
-// const loopAndThrow = (fxn, numOfParams) => {
-//     let injections;
-//     let payload = []
-//     let response = []
-//     for (let i = 0; i < falseInjections.length; i++) {
-//         injections = throwInjections(testfunction, numOfParams)
-//         response.push(i, fxn(...injections))
-//         payload.push(i, injections.join(' , '))
-//     }
-//     console.log(injections)
-//     // console.log(response, 'Response-----------')
-//     // console.log(payload, '---------------')
-// }
-
-// loopAndThrow(testfunction, 3)
-
-
-
-
-// const test = (fxn, ...pars) => {
-//     pars = [1,2,3,4,5]
-//     console.log(pars)
-// }
-
-// test('sth', 1,2,3,4,)
 
 const port = process.env.PORT || 1995;
 app.listen(port, ()=> {
