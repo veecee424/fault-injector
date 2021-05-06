@@ -11,7 +11,7 @@ const checkParams = (fxn, ...params) => {
     }
 
     if (!type) {
-        throw new Error ('Not a function - The first argument must be a function')
+        throw new Error ('Not a function - The first argument must be a valid function')
     }
  
     if (params.length) {

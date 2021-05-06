@@ -1,7 +1,7 @@
 {
   "name": "fault-injector",
   "version": "1.0.0",
-  "description": "A package which runs destructive tests on functions",
+  "description": "A package which runs destructive test cases on functions",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,5 +12,6 @@
   "devDependencies": {
     "express": "^4.17.1",
     "nodemon": "^2.0.7"
-  }
+  },
+  "keywords": "javascript, destructive testing, fault injections"
 }
