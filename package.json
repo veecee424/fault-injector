@@ -1,6 +1,6 @@
 {
   "name": "fault-injector",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A package which runs destructive test cases on functions",
   "main": "app.js",
   "scripts": {
