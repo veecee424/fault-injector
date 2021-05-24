@@ -1,22 +1,7 @@
 const faultInjections = require('../fault-injections/faultInjections')
 
-function checkParams (fxn, ...params) {
-     if (!fxn) {
-            return {
-                status: 'Failed',
-                message: 'No function specified to run tests on.',
-                data: null
-            }
-        }
-
-        if (fxn && typeof fxn !== 'function') {
-            return {
-                status: 'Failed',
-                message: `${fxn} is not a function - please provide a valid function.`,
-                data: null
-            }
-        }
-        
+function validateParams (num, ...params) {
+    
         if (!params.length) {
             return {
                 status: 'Failed',
@@ -36,6 +21,24 @@ function checkParams (fxn, ...params) {
         }
 }
 
+function validatefxn (fxn) {
+    if (!fxn) {
+        return {
+            status: 'Failed',
+            message: 'No function specified to run tests on.',
+            data: null
+        }
+    }
+
+    if (fxn && typeof fxn !== 'function') {
+        return {
+            status: 'Failed',
+            message: `${fxn} is not a function - please provide a valid function.`,
+            data: null
+        }
+    }
+}
+
 const generateRandomInjections = (...params) => {
     let arr = []
     for (let i = 0; i<params.length; i ++) {
@@ -46,5 +49,5 @@ const generateRandomInjections = (...params) => {
 
 
 module.exports = {
-    checkParams, generateRandomInjections
+    validateParams, generateRandomInjections, validatefxn
 }
