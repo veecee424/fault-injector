@@ -1,7 +1,7 @@
 {
   "name": "fault-injector",
   "version": "1.0.3",
-  "description": "A package which runs destructive test cases on functions",
+  "description": "A package which runs destructive test cases on provided functions.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

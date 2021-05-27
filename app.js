@@ -1,6 +1,6 @@
-// const express = require('express')
-// const app = express()
-const {validateParams, validatefxn} = require('././helpers/helpers')
+const express = require('express')
+const app = express()
+const {validateParams} = require('././helpers/helpers')
 const throwinjection = require('./helpers/injector')
 
 let faultinjections = {
@@ -8,118 +8,63 @@ let faultinjections = {
 }
 
 faultinjections.describe = function (func, desc) {
-    try {
-
-        this.func = func
-        this.desc = desc
-        
-        let validationError = validatefxn(func, desc)
-
-        if (!validationError) {
-            return this
-        }
-
-        return validationError
-    } catch (error) {
-        return {
-            status: 'Failed',
-            message: 'Something went wrong.',
-            data: null
-        }
-    }
+    this.func = func
+    this.desc = desc
+    return this
 }
 
 faultinjections.accepts = function (num, ...input) {
     this.params = input;
     this.num = num;
-    if (typeof num != 'number') {
-        return {
-            status: 'Error',
-            message: 'Specify the number of arguments the function accepts as a number.',
-            data: null
-        }
-    }
-    
-    if (!this.func) {
-        return {
-            status: 'Error',
-            message: 'Describe the function before calling this method',
-            data: null
-        }
-    }
-
-    if (num != input.length) {
-        return {
-            status: 'Error',
-            message: 'Number of arguments specified does not match the number of parameters passed.',
-            data: null
-        }
-    }
-    
-    let validationError = validateParams(num, ...input)
-    if (!validationError) {
-        return this
-    }
-    return validationError
+    delete this.describe;
+    return this
 }
 
-faultinjections.returns = function (input) {
-    if (typeof input != 'string') {
-        return {
-            status: 'Error',
-            message: 'Description of what the function returns should be a string',
-            data: null
-        }
-    }
-
-    if (!this.func || !this.params) {
-        return {
-            status: 'Error',
-            message: 'Describe the function and accepted parameters before calling this method',
-            data: null
-        }  
-    }
-
-    this.expected = input;
+faultinjections.returns = function (return_val) {
+    this.return_value = return_val;
+    delete this.describe;
+    delete this.accepts;
     return this;
+}
+
+faultinjections.types = function (...type) {
+    this.type = type
+    delete this.describe;
+    delete this.accepts;
+    return this
 }
 
 faultinjections.inject = function (count) {
     let numOfTimes = count || 20;
     let response = []
-    if (!this.func || !this.params) {
-        return {
-            status: 'Error',
-            message: 'Describe the function and accepted parameters before calling this method',
-            data: null
-        }  
-    } 
-    
-    if(count > 50 || count < 1) {
-        return {
-            status: 'Error',
-            message: 'Fault injections cannot be done less than once or more than 50 times',
-            data: null
-        }
-    }
-
-    if(typeof count !== 'number') {
-        return {
-            status: 'Error',
-            message: 'Please provide a valid number.',
-            data: null
-        }
+   
+    const validationError = validateParams(this.func, this.params, this.desc, this.num, this.return_value, count, this.type)
+    if (validationError) {
+        return validationError;
     }
      
     for (let i = 0; i < numOfTimes; i++) {
         response.push(throwinjection(this.func, this.params))
     }
 
-    this.description.function_description = this.desc || 'No description'
+    this.description.function_description = this.desc || 'No description';
     this.description.number_of_params = this.num;
-    this.description.name_of_params = this.params.join(' , ')
-    this.description.return_value = this.expected || 'Unspecified';
-    // this.description.data_types = this.types.join(' , ') || 'Not specified'
+    this.description.name_of_params = this.params.map((x)=> {return x.toLowerCase()}).join(' , ')
+    this.description.return_value = this.return_value || 'Return value not specified';
+    this.description.data_types = 'Data types not specified'
+
+    // Format data info to lowercase
+    if (this.type) {
+        this.description.data_types = this.type.map((x)=> {return x.toLowerCase()}).join(' , ');
+    }
+
+    if (this.desc) {
+        this.description.function_description = this.desc.toLowerCase()
+    }
+
+    if (this.return_value) {
+        this.description.return_value = this.return_value.toLowerCase()
+    }
 
     return {
         Description: this.description,
@@ -127,16 +72,18 @@ faultinjections.inject = function (count) {
     }
 }
 
-const fxnion = (a, b) => {if (typeof a == 'string')return 'true'}
+const fxnion = (a, b) => {if (typeof a == 'number' && typeof b == 'number')return a+b}
 
 // console.log(faultinjections.throwinjection(fxnion, "email"))
-// console.log(faultinjections.describe(fxnion)
-//                                     .accepts(2, 'email', 'password')
-//                                     .returns('A number')
-//                                     .inject('5'))
+var res = faultinjections.describe(fxnion, 'This is a function which accepts two number arguments and returns their sum.')
+                .accepts(2, 'num1', 'num2')
+                .types('number', 'number')
+                .returns('a number')
+           
+console.log(res.inject(''))
 
-// const port = process.env.PORT || 1995;
-// app.listen(port, ()=> {
-//     console.log('Listening on ' + port)
-// })
+const port = process.env.PORT || 1995;
+app.listen(port, ()=> {
+    console.log('Listening on ' + port)
+})
 module.exports = faultinjections;
