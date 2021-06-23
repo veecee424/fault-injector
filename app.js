@@ -1,5 +1,3 @@
-const express = require('express')
-const app = express()
 const {validateParams} = require('././helpers/helpers')
 const throwinjection = require('./helpers/injector')
 
@@ -72,18 +70,4 @@ faultinjections.inject = function (count) {
     }
 }
 
-const fxnion = (a, b) => {if (typeof a == 'number' && typeof b == 'number')return a+b}
-
-// console.log(faultinjections.throwinjection(fxnion, "email"))
-var res = faultinjections.describe(fxnion, 'This is a function which accepts two number arguments and returns their sum.')
-                .accepts(2, 'num1', 'num2')
-                .types('number', 'number')
-                .returns('a number')
-           
-console.log(res.inject(''))
-
-const port = process.env.PORT || 1995;
-app.listen(port, ()=> {
-    console.log('Listening on ' + port)
-})
 module.exports = faultinjections;
