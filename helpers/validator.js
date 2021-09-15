@@ -1,5 +1,3 @@
-const faultInjections = require('../fault-injections/faultInjections')
-
 function validateParams (func, params, desc, num, return_val, count, type) {
 
     if (type && type.length !== num) {
@@ -91,25 +89,14 @@ function validateParams (func, params, desc, num, return_val, count, type) {
         }
     }
 
-    for (let i = 0; i < params.length; i++) {
-        if (params.length && typeof params[i] != 'string') {
+    for (let item of params) {
+        if (params.length && typeof item != 'string') {
             return {
                 code: 'TYPE_ERR',
-                message: `${params[i]} is not a string - specify all function parameter names as strings.`,
+                message: `${item} is not a string - specify all function parameter names as strings.`,
             }
         }
     }
 }
 
-const generateRandomInjections = (...params) => {
-    let arr = []
-    for (let i = 0; i<params.length; i ++) {
-        arr.push(faultInjections[Math.floor(Math.random() * faultInjections.length)])
-    }
-    return arr;
-}
-
-
-module.exports = {
-    validateParams, generateRandomInjections
-}
+module.exports = validateParams;

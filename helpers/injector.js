@@ -1,4 +1,4 @@
-const {generateRandomInjections} = require('./helpers')
+const generateRandomInjections = require('./generateRandomInjections')
 
 function throwinjection (fxn, params) {
     let payloadObj = {}

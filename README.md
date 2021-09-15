@@ -49,10 +49,15 @@ Output => { Description:
 ```
 ### More on usage
 ```js
-var sumFunction = faultinjections.describe(fxnion, 'This is a function which accepts two number arguments and returns their sum.')
-                          .accepts(2, 'num1', 'num2')
-                          .types('number', 'number')
-                          .returns('a number')
+function fxn (a, b) {
+    if (typeof a == 'number' && typeof b == 'number')
+    return a+b
+}
+
+var sumFunction = faultinjections.describe(fxn, 'This is a function which accepts two number arguments and returns their sum.')
+                                 .accepts(2, 'num1', 'num2')
+                                 .types('number', 'number')
+                                 .returns('a number')
 
 console.log(sumFunction.inject(5))
 Output => { Description:
@@ -80,39 +85,44 @@ Output => { Description:
 
 ### Some errors and error messages
 ```js
-var sumFunction = faultinjections.describe('fxnion', 'This is a function which accepts two number arguments and returns their sum.')
-                          .accepts(2, 'num1', 'num2')
-                          .types('number', 'number')
-                          .returns('a number')
+function fxn (a, b) {
+    if (typeof a == 'number' && typeof b == 'number')
+    return a+b
+}
+
+var sumFunction = faultinjections.describe('fxn', 'This is a function which accepts two number arguments and returns their sum.')
+.accepts(2, 'num1', 'num2')
+.types('number', 'number')
+.returns('a number')
 
 console.log(sumFunction.inject())
 { code: 'TYPE_ERR',
-  message: 'fxnion is not a function, please provide a valid function.' }
+  message: 'fxn is not a function, please provide a valid function.' }
 
-var sumFunction = faultinjections.describe(fxnion, 'This is a function which accepts two number arguments and returns their sum.')
-                          .accepts('2', 'num1', 'num2')
-                          .types('number', 'number')
-                          .returns('a number')
+var sumFunction = faultinjections.describe(fxn, 'This is a function which accepts two number arguments and returns their sum.')
+.accepts('2', 'num1', 'num2')
+.types('number', 'number')
+.returns('a number')
 
 console.log(sumFunction.inject())
 { code: 'TYPE_ERR',
   message:
    'Please provide a valid number of arguments in the .accepts() method.' }
 
-var sumFunction = faultinjections.describe(fxnion, 'This is a function which accepts two number arguments and returns their sum.')
-                          .accepts('2', 'num1', 'num2', 'num3')
-                          .types('number', 'number')
-                          .returns('a number')
+var sumFunction = faultinjections.describe(fxn, 'This is a function which accepts two number arguments and returns their sum.')
+.accepts('2', 'num1', 'num2', 'num3')
+.types('number', 'number')
+.returns('a number')
 
 console.log(sumFunction.inject())
 { code: 'NO_MATCH',
   message:
    'Number of provided parameter names does not match the specified number of parameters in the .accepts() method.' }
 
-var sumFunction = faultinjections.describe(fxnion, 'This is a function which accepts two number arguments and returns their sum.')
-                          .accepts('2', 'num1', 'num2')
-                          .types('number', 'number')
-                          .returns('a number')
+var sumFunction = faultinjections.describe(fxn, 'This is a function which accepts two number arguments and returns their sum.')
+.accepts('2', 'num1', 'num2')
+.types('number', 'number')
+.returns('a number')
 
 console.log(sumFunction.inject(''))
 { code: 'TYPE_ERR',
